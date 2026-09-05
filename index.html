@@ -1,0 +1,1029 @@
+<!doctype html>
+<html lang="id">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Buku Kas Kos</title>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap");
+
+			:root {
+				--paper: #efeee6;
+				--paper-line: #c9d6dc;
+				--cream-card: #fbfaf6;
+				--navy: #1b3a5c;
+				--navy-deep: #0f2438;
+				--stamp-red: #ad3a2c;
+				--ledger-green: #2f6b4f;
+				--ink-soft: #6b6558;
+				--ink-faint: #948c7c;
+				--border: #d8d2c2;
+			}
+
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				background: var(--paper);
+				background-image: repeating-linear-gradient(
+					to bottom,
+					transparent,
+					transparent 31px,
+					var(--paper-line) 31px,
+					var(--paper-line) 32px
+				);
+				font-family: "Inter", sans-serif;
+				color: var(--navy-deep);
+				padding: 28px 16px 80px;
+				min-height: 100vh;
+			}
+
+			.wrap {
+				max-width: 640px;
+				margin: 0 auto;
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				* {
+					animation-duration: 0.01ms !important;
+					transition-duration: 0.01ms !important;
+				}
+			}
+
+			/* ---------- header / passbook cover ---------- */
+			.cover {
+				background: linear-gradient(
+					135deg,
+					var(--navy) 0%,
+					var(--navy-deep) 100%
+				);
+				border-radius: 10px;
+				padding: 22px 24px 20px;
+				color: #f0efe9;
+				box-shadow:
+					0 6px 0 rgba(15, 36, 56, 0.18),
+					0 10px 24px rgba(15, 36, 56, 0.22);
+				position: relative;
+				overflow: hidden;
+			}
+			.cover::before {
+				content: "";
+				position: absolute;
+				inset: 0;
+				background-image: repeating-linear-gradient(
+					45deg,
+					rgba(255, 255, 255, 0.025) 0 2px,
+					transparent 2px 14px
+				);
+				pointer-events: none;
+			}
+			.cover-eyebrow {
+				font-family: "Space Mono", monospace;
+				font-size: 11px;
+				letter-spacing: 0.18em;
+				text-transform: uppercase;
+				color: #a9c0d6;
+				margin-bottom: 6px;
+			}
+			.cover-title {
+				font-family: "Fraunces", serif;
+				font-weight: 600;
+				font-size: 30px;
+				letter-spacing: 0.01em;
+			}
+			.cover-sub {
+				font-size: 13px;
+				color: #c6d3e0;
+				margin-top: 4px;
+			}
+
+			/* ---------- balance block ---------- */
+			.balance-row {
+				display: flex;
+				align-items: flex-end;
+				justify-content: space-between;
+				gap: 16px;
+				margin-top: 22px;
+				flex-wrap: wrap;
+			}
+			.balance-label {
+				font-size: 12px;
+				color: #a9c0d6;
+				text-transform: uppercase;
+				letter-spacing: 0.12em;
+				margin-bottom: 4px;
+			}
+			.balance-amount {
+				font-family: "Space Mono", monospace;
+				font-weight: 700;
+				font-size: 34px;
+				color: #fff;
+				line-height: 1;
+			}
+			.balance-amount.negative {
+				color: #e8a099;
+			}
+
+			.sync-badge {
+				margin-top: 14px;
+				font-family: "Space Mono", monospace;
+				font-size: 10.5px;
+				letter-spacing: 0.02em;
+				color: #9fd9b8;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			.sync-badge::before {
+				content: "\25CF";
+				color: #4fbe7e;
+				font-size: 8px;
+			}
+			.sync-badge.offline {
+				color: #e8c199;
+			}
+			.sync-badge.offline::before {
+				color: #d99b4f;
+			}
+
+			/* stamp */
+			.stamp {
+				font-family: "Space Mono", monospace;
+				font-size: 11px;
+				font-weight: 700;
+				letter-spacing: 0.06em;
+				text-align: center;
+				color: var(--stamp-red);
+				border: 2px solid var(--stamp-red);
+				border-radius: 50%;
+				width: 96px;
+				height: 96px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transform: rotate(-9deg);
+				padding: 8px;
+				background: rgba(173, 58, 44, 0.06);
+				flex-shrink: 0;
+				line-height: 1.25;
+			}
+			.stamp.ok {
+				color: var(--ledger-green);
+				border-color: var(--ledger-green);
+				background: rgba(47, 107, 79, 0.06);
+			}
+			.stamp-num {
+				font-size: 20px;
+				display: block;
+			}
+
+			/* ---------- cards ---------- */
+			.card {
+				background: var(--cream-card);
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				padding: 18px 18px 20px;
+				margin-top: 16px;
+				box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+			}
+			.card h2 {
+				font-family: "Fraunces", serif;
+				font-weight: 600;
+				font-size: 16px;
+				color: var(--navy);
+				margin-bottom: 12px;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.card h2 .idx {
+				font-family: "Space Mono", monospace;
+				font-size: 11px;
+				color: var(--ink-faint);
+				font-weight: 400;
+			}
+
+			/* ---------- form ---------- */
+			.type-toggle {
+				display: flex;
+				gap: 8px;
+				margin-bottom: 14px;
+			}
+			.type-btn {
+				flex: 1;
+				padding: 9px 10px;
+				border-radius: 6px;
+				border: 1.5px solid var(--border);
+				background: #fff;
+				font-family: "Inter", sans-serif;
+				font-weight: 600;
+				font-size: 13px;
+				color: var(--ink-soft);
+				cursor: pointer;
+				transition: all 0.15s ease;
+			}
+			.type-btn.active[data-type="masuk"] {
+				background: var(--ledger-green);
+				border-color: var(--ledger-green);
+				color: #fff;
+			}
+			.type-btn.active[data-type="keluar"] {
+				background: var(--stamp-red);
+				border-color: var(--stamp-red);
+				color: #fff;
+			}
+			.type-btn.active[data-type="pindah"] {
+				background: var(--navy);
+				border-color: var(--navy);
+				color: #fff;
+			}
+
+			/* ---------- rincian saldo tunai/bank ---------- */
+			.source-split {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 10px;
+			}
+			.source-box {
+				border: 1.5px solid var(--border);
+				border-radius: 8px;
+				padding: 12px 14px;
+				background: var(--paper);
+			}
+			.source-box-label {
+				font-size: 11px;
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				color: var(--ink-faint);
+				font-weight: 600;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				margin-bottom: 6px;
+			}
+			.source-box-label::before {
+				content: "";
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+			}
+			.source-box.cash .source-box-label::before {
+				background: var(--ledger-green);
+			}
+			.source-box.bank .source-box-label::before {
+				background: var(--navy);
+			}
+			.source-box-amount {
+				font-family: "Space Mono", monospace;
+				font-weight: 700;
+				font-size: 18px;
+				color: var(--navy-deep);
+			}
+			.source-box-amount.negative {
+				color: var(--stamp-red);
+			}
+
+			.field-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 10px;
+				margin-bottom: 10px;
+			}
+			.field {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+			}
+			.field.full {
+				grid-column: 1 / -1;
+			}
+			.field label {
+				font-size: 11px;
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				color: var(--ink-faint);
+				font-weight: 600;
+			}
+			.field input,
+			.field select {
+				border: 1.5px solid var(--border);
+				border-radius: 6px;
+				padding: 9px 10px;
+				font-family: "Inter", sans-serif;
+				font-size: 14px;
+				background: #fff;
+				color: var(--navy-deep);
+			}
+			.field input:focus,
+			.field select:focus {
+				outline: none;
+				border-color: var(--navy);
+			}
+
+			.submit-btn {
+				width: 100%;
+				padding: 11px;
+				border-radius: 6px;
+				border: none;
+				background: var(--navy);
+				color: #fff;
+				font-weight: 700;
+				font-size: 14px;
+				cursor: pointer;
+				font-family: "Inter", sans-serif;
+				letter-spacing: 0.02em;
+				transition: background 0.15s ease;
+			}
+			.submit-btn:hover {
+				background: var(--navy-deep);
+			}
+
+			/* ---------- ledger list ---------- */
+			.ledger-empty {
+				text-align: center;
+				padding: 24px 10px;
+				color: var(--ink-faint);
+				font-size: 13px;
+			}
+			.day-group {
+				margin-bottom: 6px;
+			}
+			.day-label {
+				font-family: "Space Mono", monospace;
+				font-size: 11px;
+				color: var(--ink-faint);
+				padding: 10px 2px 4px;
+				letter-spacing: 0.04em;
+				border-top: 1px dashed var(--border);
+			}
+			.day-group:first-child .day-label {
+				border-top: none;
+				padding-top: 0;
+			}
+
+			.tx-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 10px;
+				padding: 9px 2px;
+				border-bottom: 1px dotted var(--border);
+			}
+			.tx-row:last-child {
+				border-bottom: none;
+			}
+			.tx-left {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				min-width: 0;
+			}
+			.tx-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.tx-dot.masuk {
+				background: var(--ledger-green);
+			}
+			.tx-dot.keluar {
+				background: var(--stamp-red);
+			}
+			.tx-info {
+				min-width: 0;
+			}
+			.tx-cat {
+				font-size: 13.5px;
+				font-weight: 600;
+				color: var(--navy-deep);
+			}
+			.tx-note {
+				font-size: 12px;
+				color: var(--ink-faint);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.tx-src {
+				display: inline-block;
+				font-family: "Space Mono", monospace;
+				font-size: 9.5px;
+				font-weight: 700;
+				letter-spacing: 0.03em;
+				text-transform: uppercase;
+				padding: 1px 5px;
+				border-radius: 3px;
+				margin-left: 6px;
+				vertical-align: middle;
+			}
+			.tx-src.cash {
+				background: rgba(47, 107, 79, 0.12);
+				color: var(--ledger-green);
+			}
+			.tx-src.bank {
+				background: rgba(27, 58, 92, 0.12);
+				color: var(--navy);
+			}
+			.tx-right {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				flex-shrink: 0;
+			}
+			.tx-amount {
+				font-family: "Space Mono", monospace;
+				font-weight: 700;
+				font-size: 13.5px;
+			}
+			.tx-amount.masuk {
+				color: var(--ledger-green);
+			}
+			.tx-amount.keluar {
+				color: var(--stamp-red);
+			}
+			.tx-del {
+				background: none;
+				border: none;
+				color: var(--ink-faint);
+				cursor: pointer;
+				font-size: 16px;
+				line-height: 1;
+				padding: 2px 4px;
+				opacity: 0.5;
+				transition: opacity 0.15s ease;
+			}
+			.tx-del:hover {
+				opacity: 1;
+				color: var(--stamp-red);
+			}
+
+			/* ---------- kategori bars ---------- */
+			.cat-row {
+				margin-bottom: 10px;
+			}
+			.cat-row-top {
+				display: flex;
+				justify-content: space-between;
+				font-size: 12.5px;
+				margin-bottom: 4px;
+			}
+			.cat-row-top .name {
+				color: var(--navy-deep);
+				font-weight: 600;
+			}
+			.cat-row-top .amt {
+				font-family: "Space Mono", monospace;
+				color: var(--ink-soft);
+			}
+			.bar-track {
+				height: 7px;
+				background: var(--paper);
+				border-radius: 4px;
+				overflow: hidden;
+				border: 1px solid var(--border);
+			}
+			.bar-fill {
+				height: 100%;
+				background: var(--navy);
+				border-radius: 4px;
+				transition: width 0.4s ease;
+			}
+
+			/* footer note */
+			.footnote {
+				text-align: center;
+				color: var(--ink-faint);
+				font-size: 11.5px;
+				margin-top: 20px;
+				font-family: "Space Mono", monospace;
+			}
+
+			::selection {
+				background: var(--navy);
+				color: #fff;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="wrap">
+			<div class="cover">
+				<div class="cover-eyebrow">Buku Kas &middot; Anak Kos</div>
+				<div class="cover-title">Dompet Bulanan</div>
+				<div class="cover-sub" id="periodLabel">Memuat catatan...</div>
+
+				<div class="balance-row">
+					<div>
+						<div class="balance-label">Saldo saat ini</div>
+						<div class="balance-amount" id="balanceAmount">Rp 0</div>
+					</div>
+					<div class="stamp ok" id="survivalStamp">
+						<span>Belum ada<br />data</span>
+					</div>
+				</div>
+				<div class="sync-badge" id="syncBadge">
+					Memeriksa status penyimpanan...
+				</div>
+			</div>
+
+			<div class="card">
+				<h2><span class="idx">01</span> Catat Transaksi</h2>
+				<div class="type-toggle">
+					<button
+						class="type-btn active"
+						data-type="keluar"
+						onclick="setType('keluar')"
+					>
+						Pengeluaran
+					</button>
+					<button class="type-btn" data-type="masuk" onclick="setType('masuk')">
+						Pemasukan
+					</button>
+					<button
+						class="type-btn"
+						data-type="pindah"
+						onclick="setType('pindah')"
+					>
+						Pindah Dana
+					</button>
+				</div>
+				<div class="field-grid">
+					<div class="field" id="catField">
+						<label>Kategori</label>
+						<select id="catInput"></select>
+					</div>
+					<div class="field" id="sourceField">
+						<label>Sumber Dana</label>
+						<select id="sourceInput">
+							<option value="cash">Tunai</option>
+							<option value="bank">M-Banking/E-Wallet</option>
+						</select>
+					</div>
+					<div class="field full" id="directionField" style="display: none">
+						<label>Arah Pindah</label>
+						<select id="directionInput">
+							<option value="cash-to-bank">
+								Tunai &rarr; M-Banking (setor/top up)
+							</option>
+							<option value="bank-to-cash">
+								M-Banking &rarr; Tunai (tarik tunai)
+							</option>
+						</select>
+					</div>
+					<div class="field">
+						<label>Jumlah (Rp)</label>
+						<input
+							type="number"
+							id="amountInput"
+							placeholder="15000"
+							min="0"
+							inputmode="numeric"
+						/>
+					</div>
+					<div class="field full">
+						<label>Catatan (opsional)</label>
+						<input
+							type="text"
+							id="noteInput"
+							placeholder="mis. makan siang warteg"
+						/>
+					</div>
+					<div class="field">
+						<label>Tanggal</label>
+						<input type="date" id="dateInput" />
+					</div>
+				</div>
+				<button class="submit-btn" onclick="addTransaction()">
+					+ Tambah Catatan
+				</button>
+			</div>
+
+			<div class="card">
+				<h2><span class="idx">02</span> Rincian Saldo</h2>
+				<div class="source-split" id="sourceSplit"></div>
+			</div>
+
+			<div class="card">
+				<h2><span class="idx">03</span> Pengeluaran per Kategori</h2>
+				<div id="catBreakdown">
+					<div class="ledger-empty">Belum ada pengeluaran tercatat.</div>
+				</div>
+			</div>
+
+			<div class="card">
+				<h2><span class="idx">04</span> Riwayat Kas</h2>
+				<div id="ledgerList">
+					<div class="ledger-empty">
+						Belum ada transaksi. Yuk mulai catat &mdash; anak kos wajib melek
+						keuangan!
+					</div>
+				</div>
+			</div>
+
+			<div class="footnote">tersimpan otomatis di perangkatmu</div>
+		</div>
+
+		<script>
+			const CATEGORIES = {
+				keluar: [
+					"Kos",
+					"Makan",
+					"Jajan/Nongkrong",
+					"Transportasi",
+					"Listrik/Token",
+					"Laundry",
+					"Kuota/Pulsa",
+					"Kebutuhan Kuliah",
+					"Lain-lain",
+				],
+				masuk: [
+					"Kiriman Ortu",
+					"Uang Saku",
+					"Kerja Part-time",
+					"Beasiswa",
+					"Lain-lain",
+				],
+			};
+
+			let currentType = "keluar";
+			let transactions = [];
+			const STORAGE_KEY = "kos-transactions";
+
+			function todayStr() {
+				return new Date().toISOString().slice(0, 10);
+			}
+
+			function setType(type) {
+				currentType = type;
+				document.querySelectorAll(".type-btn").forEach((b) => {
+					b.classList.toggle("active", b.dataset.type === type);
+				});
+
+				const catField = document.getElementById("catField");
+				const sourceField = document.getElementById("sourceField");
+				const directionField = document.getElementById("directionField");
+
+				if (type === "pindah") {
+					catField.style.display = "none";
+					sourceField.style.display = "none";
+					directionField.style.display = "";
+				} else {
+					catField.style.display = "";
+					sourceField.style.display = "";
+					directionField.style.display = "none";
+					populateCategories();
+				}
+			}
+
+			function populateCategories() {
+				const sel = document.getElementById("catInput");
+				sel.innerHTML = CATEGORIES[currentType]
+					.map((c) => `<option value="${c}">${c}</option>`)
+					.join("");
+			}
+
+			function formatRupiah(n) {
+				const sign = n < 0 ? "-" : "";
+				return sign + "Rp " + Math.abs(Math.round(n)).toLocaleString("id-ID");
+			}
+
+			function formatDayLabel(dateStr) {
+				const d = new Date(dateStr + "T00:00:00");
+				return d.toLocaleDateString("id-ID", {
+					weekday: "long",
+					day: "numeric",
+					month: "long",
+				});
+			}
+
+			function hasClaudeStorage() {
+				return typeof window.storage !== "undefined" && window.storage !== null;
+			}
+
+			function loadFromLocalStorage() {
+				try {
+					const raw = localStorage.getItem(STORAGE_KEY);
+					return raw ? JSON.parse(raw) : [];
+				} catch (e) {
+					return [];
+				}
+			}
+
+			function saveToLocalStorage() {
+				try {
+					localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+				} catch (e) {
+					console.error("localStorage gagal:", e);
+				}
+			}
+
+			async function loadTransactions() {
+				// Prioritas: penyimpanan akun Claude (window.storage) -> sinkron di semua perangkat
+				// selama dibuka lewat Claude dengan akun yang sama.
+				// Kalau dibuka sebagai file HTML biasa (offline), window.storage tidak ada,
+				// jadi otomatis pakai localStorage sebagai cadangan (hanya berlaku di browser itu saja).
+				if (hasClaudeStorage()) {
+					try {
+						const result = await window.storage.get(STORAGE_KEY, false);
+						transactions = result ? JSON.parse(result.value) : [];
+						updateSyncBadge(true);
+					} catch (e) {
+						transactions = [];
+						updateSyncBadge(true);
+					}
+				} else {
+					transactions = loadFromLocalStorage();
+					updateSyncBadge(false);
+				}
+				render();
+			}
+
+			async function saveTransactions() {
+				if (hasClaudeStorage()) {
+					try {
+						await window.storage.set(
+							STORAGE_KEY,
+							JSON.stringify(transactions),
+							false,
+						);
+						return;
+					} catch (e) {
+						console.error(
+							"Gagal menyimpan ke akun Claude, fallback ke lokal:",
+							e,
+						);
+					}
+				}
+				// fallback kalau window.storage tidak tersedia atau gagal
+				saveToLocalStorage();
+			}
+
+			function updateSyncBadge(synced) {
+				const el = document.getElementById("syncBadge");
+				if (!el) return;
+				if (synced) {
+					el.textContent =
+						"Tersinkron ke akunmu \u00b7 bisa diakses dari HP & laptop";
+					el.classList.remove("offline");
+				} else {
+					el.textContent = "Mode offline \u00b7 hanya tersimpan di browser ini";
+					el.classList.add("offline");
+				}
+			}
+
+			function addTransaction() {
+				const amountRaw = document.getElementById("amountInput").value;
+				const note = document.getElementById("noteInput").value.trim();
+				const date = document.getElementById("dateInput").value || todayStr();
+				const amount = parseFloat(amountRaw);
+
+				if (!amount || amount <= 0) {
+					document.getElementById("amountInput").focus();
+					return;
+				}
+
+				if (currentType === "pindah") {
+					const direction = document.getElementById("directionInput").value; // "cash-to-bank" | "bank-to-cash"
+					const from = direction === "cash-to-bank" ? "cash" : "bank";
+					const to = direction === "cash-to-bank" ? "bank" : "cash";
+					transactions.push({
+						id: Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+						type: "pindah",
+						category:
+							direction === "cash-to-bank"
+								? "Setor ke M-Banking"
+								: "Tarik Tunai",
+						from: from,
+						to: to,
+						amount: amount,
+						note: note,
+						date: date,
+					});
+				} else {
+					const cat = document.getElementById("catInput").value;
+					const source = document.getElementById("sourceInput").value; // "cash" | "bank"
+					transactions.push({
+						id: Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+						type: currentType,
+						category: cat,
+						source: source,
+						amount: amount,
+						note: note,
+						date: date,
+					});
+				}
+
+				document.getElementById("amountInput").value = "";
+				document.getElementById("noteInput").value = "";
+
+				saveTransactions();
+				render();
+			}
+
+			function deleteTransaction(id) {
+				transactions = transactions.filter((t) => t.id !== id);
+				saveTransactions();
+				render();
+			}
+
+			function computeBalance() {
+				let cash = 0,
+					bank = 0;
+				transactions.forEach((t) => {
+					if (t.type === "masuk") {
+						if (t.source === "cash") cash += t.amount;
+						else bank += t.amount;
+					} else if (t.type === "keluar") {
+						if (t.source === "cash") cash -= t.amount;
+						else bank -= t.amount;
+					} else if (t.type === "pindah") {
+						if (t.from === "cash") cash -= t.amount;
+						else bank -= t.amount;
+						if (t.to === "cash") cash += t.amount;
+						else bank += t.amount;
+					}
+				});
+				return { total: cash + bank, cash, bank };
+			}
+
+			function computeSurvival(balance) {
+				const now = new Date();
+				const since = new Date(now);
+				since.setDate(since.getDate() - 14);
+				const recentExpenses = transactions.filter(
+					(t) => t.type === "keluar" && new Date(t.date + "T00:00:00") >= since,
+				);
+				if (recentExpenses.length === 0) return null;
+
+				const totalRecent = recentExpenses.reduce((s, t) => s + t.amount, 0);
+				const earliestDate = recentExpenses.reduce(
+					(min, t) => (t.date < min ? t.date : min),
+					recentExpenses[0].date,
+				);
+				const daysSpan = Math.max(
+					1,
+					Math.round((now - new Date(earliestDate + "T00:00:00")) / 86400000) +
+						1,
+				);
+				const dailyAvg = totalRecent / daysSpan;
+				if (dailyAvg <= 0) return null;
+
+				const daysLeft = Math.max(0, Math.floor(balance / dailyAvg));
+				return { daysLeft, dailyAvg };
+			}
+
+			function renderBalance() {
+				const balance = computeBalance();
+				const el = document.getElementById("balanceAmount");
+				el.textContent = formatRupiah(balance.total);
+				el.classList.toggle("negative", balance.total < 0);
+
+				const stamp = document.getElementById("survivalStamp");
+				const survival = computeSurvival(balance.total);
+
+				if (balance.total < 0) {
+					stamp.className = "stamp";
+					stamp.innerHTML =
+						"MINUS!<br><span style='font-size:10px'>segera isi ulang</span>";
+				} else if (!survival) {
+					stamp.className = "stamp ok";
+					stamp.innerHTML = "Belum ada<br>data cukup";
+				} else {
+					const isLow = survival.daysLeft <= 5;
+					stamp.className = "stamp" + (isLow ? "" : " ok");
+					stamp.innerHTML = `<span class="stamp-num">${survival.daysLeft}</span>hari lagi`;
+				}
+
+				renderSourceSplit(balance);
+			}
+
+			function renderSourceSplit(balance) {
+				const el = document.getElementById("sourceSplit");
+				el.innerHTML = `
+    <div class="source-box cash">
+      <div class="source-box-label">Tunai</div>
+      <div class="source-box-amount ${balance.cash < 0 ? "negative" : ""}">${formatRupiah(balance.cash)}</div>
+    </div>
+    <div class="source-box bank">
+      <div class="source-box-label">M-Banking/E-Wallet</div>
+      <div class="source-box-amount ${balance.bank < 0 ? "negative" : ""}">${formatRupiah(balance.bank)}</div>
+    </div>
+  `;
+			}
+
+			function renderCategoryBreakdown() {
+				const container = document.getElementById("catBreakdown");
+				const expenses = transactions.filter((t) => t.type === "keluar");
+				if (expenses.length === 0) {
+					container.innerHTML =
+						'<div class="ledger-empty">Belum ada pengeluaran tercatat.</div>';
+					return;
+				}
+				const byCat = {};
+				expenses.forEach((t) => {
+					byCat[t.category] = (byCat[t.category] || 0) + t.amount;
+				});
+				const max = Math.max(...Object.values(byCat));
+				const sorted = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+
+				container.innerHTML = sorted
+					.map(
+						([cat, amt]) => `
+    <div class="cat-row">
+      <div class="cat-row-top">
+        <span class="name">${cat}</span>
+        <span class="amt">${formatRupiah(amt)}</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${((amt / max) * 100).toFixed(0)}%"></div></div>
+    </div>
+  `,
+					)
+					.join("");
+			}
+
+			function renderLedger() {
+				const container = document.getElementById("ledgerList");
+				if (transactions.length === 0) {
+					container.innerHTML =
+						'<div class="ledger-empty">Belum ada transaksi. Yuk mulai catat &mdash; anak kos wajib melek keuangan!</div>';
+					return;
+				}
+
+				const byDate = {};
+				transactions.forEach((t) => {
+					if (!byDate[t.date]) byDate[t.date] = [];
+					byDate[t.date].push(t);
+				});
+
+				const dates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
+
+				container.innerHTML = dates
+					.map(
+						(date) => `
+    <div class="day-group">
+      <div class="day-label">${formatDayLabel(date)}</div>
+      ${byDate[date]
+				.map(
+					(t) => `
+        <div class="tx-row">
+          <div class="tx-left">
+            <div class="tx-dot ${t.type === "pindah" ? "" : t.type}" style="${t.type === "pindah" ? "background:var(--navy);" : ""}"></div>
+            <div class="tx-info">
+              <div class="tx-cat">${t.category}${sourceBadge(t)}</div>
+              ${t.note ? `<div class="tx-note">${escapeHtml(t.note)}</div>` : ""}
+            </div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-amount ${t.type === "pindah" ? "" : t.type}" style="${t.type === "pindah" ? "color:var(--navy);" : ""}">${t.type === "masuk" ? "+" : t.type === "keluar" ? "-" : "\u21c4"}${formatRupiah(t.amount)}</div>
+            <button class="tx-del" onclick="deleteTransaction('${t.id}')" aria-label="Hapus">&times;</button>
+          </div>
+        </div>
+      `,
+				)
+				.join("")}
+    </div>
+  `,
+					)
+					.join("");
+			}
+
+			function sourceBadge(t) {
+				if (t.type === "pindah") {
+					const fromLabel = t.from === "cash" ? "Tunai" : "M-Banking";
+					const toLabel = t.to === "cash" ? "Tunai" : "M-Banking";
+					return `<span class="tx-src bank">${fromLabel} \u2192 ${toLabel}</span>`;
+				}
+				if (!t.source) return "";
+				return t.source === "cash"
+					? `<span class="tx-src cash">Tunai</span>`
+					: `<span class="tx-src bank">M-Banking</span>`;
+			}
+
+			function renderPeriodLabel() {
+				const now = new Date();
+				document.getElementById("periodLabel").textContent =
+					now.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+			}
+
+			function escapeHtml(str) {
+				const div = document.createElement("div");
+				div.textContent = str;
+				return div.innerHTML;
+			}
+
+			function render() {
+				renderBalance();
+				renderCategoryBreakdown();
+				renderLedger();
+			}
+
+			document.getElementById("dateInput").value = todayStr();
+			renderPeriodLabel();
+			populateCategories();
+			loadTransactions();
+		</script>
+	</body>
+</html>
